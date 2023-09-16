@@ -49,12 +49,12 @@ For more information on SwiftLint Rules see: [https://realm.github.io/SwiftLint/
 3. Then select the Package Dependencies tab
 4. Click the + under the "Add package here" text
 
-![Edit the Project Package Settings](_README_IMAGES/Add Package-1.jpg)
+![Edit the Project Package Settings](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/59d09a38-8cce-45fc-a833-b0e6c81bf3d6)
 
 5. Paste https://github.com/GayleDunham/SwiftLintPlugin in the search box.
 6. Click Add Package
 
-![Paste the link and Add Package](_README_IMAGES/Add Package-2.jpg)
+![Paste the link and Add Package](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/ee794f81-62d9-4088-a289-0e8814816ee7)
 
 ### Optionally: Add the Build Tool to your Target.
 
@@ -62,11 +62,11 @@ For more information on SwiftLint Rules see: [https://realm.github.io/SwiftLint/
 8. Then select the Build Phases tab
 9. Expand Run Build Tool Plug-in and Click the +
 
-![Edit the Target Build Setings](_README_IMAGES/Add Build Tool-1.jpg)
+![Edit the Target Build Setings](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/5a415120-be99-49f1-b988-c6a39fa1de93)
 
 10. Select SwiftLintBuildTool and Click Add
 
-![Select the Build Tool and Add](_README_IMAGES/Add Build Tool-2.jpg)
+![Select the Build Tool and Add](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/1f918208-fbe3-4821-9fbf-864ab5c44d53)
 
 # Features 
 
@@ -76,7 +76,7 @@ The `SwiftLintBuildTool` is a pre-build command that runs swiftlint against a Ta
 
 ## Commands
 
-Command are run against one or more selected Targets
+Commands are run against one or more selected Targets
 
 - `SwiftLintFix`:       Correct violations whenever possible
 - `SwiftLintLinter`:    Print lint warnings and errors
@@ -88,11 +88,12 @@ Command are run against one or more selected Targets
 
 * To Run Commands from the Project Navigator: Right-click on the first item (The Project or Package) in the Project Navigator, then Click the Command to run.
 
-![Run Command from Project Navigator](_README_IMAGES/Run Command-1.jpg)
+![Run Command from Project Navigator](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/32e94147-4729-4245-b273-e8d3460f250c)
+
 
 * To Run Commands from the Menu: Select the first item (The Project or Package) in the Project Navigator. Then in the Menu, Select File -> Packages and the Command to run.
 
-![Run Command from Project Navigator](_README_IMAGES/Run Command-2.jpg)
+![Run Command from Project Navigator](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/2c9b173b-b889-470d-a64c-6711fa41cbf5)
 
 # Command Line Usage For Swift Packages
 
