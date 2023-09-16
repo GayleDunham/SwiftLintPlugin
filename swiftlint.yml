@@ -1,0 +1,59 @@
+#
+#  SwiftLint Configuration
+#
+#  Created by Gayle Dunham on 9/8/22.
+#  Copyright © 2022-2023 Dirty Dog Software, LLC. All rights reserved.
+
+#
+# Reference:
+#
+#   SwiftLint Repository -
+#       https://github.com/realm/SwiftLint
+#
+#   SwiftLint Rule Directory Reference -
+#       https://realm.github.io/SwiftLint/rule-directory.html
+#
+#   The Official raywenderlich.com SwiftLint Policy -
+#       https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown
+#
+#   com.raywenderlich.swiftlint.yml - The Official Kodeco Configuration file -
+#       https://github.com/kodecocodes/swift-style-guide/blob/main/com.raywenderlich.swiftlint.yml
+#
+#   The Official Kodeco Swift Style Guide -
+#       https://github.com/kodecocodes/swift-style-guide
+
+# Default DDS SwiftLint Configuration
+parent_config: /Users/Shared/com.dirtydogsoftware.swiftlint.yml
+
+# Example to Ignore Core Data generated `NSManagedObject` subclasses during linting.
+#excluded:
+#    - "Inventory/Models/Generated Code/"
+
+# ------------------------------------------------------------------------------------------------
+#   Installation for Xcode Projects
+# ------------------------------------------------------------------------------------------------
+#
+#   1. Add the package `https://github.com/GayleDunham/SwiftLintPlugin` to the project.
+#
+#   2. Optionally: Add the `SwiftLintBuildTool` plugin to the targets you want to be evaluated by the linter.
+#
+
+# ------------------------------------------------------------------------------------------------
+#   Installation for Swift Packaged
+# ------------------------------------------------------------------------------------------------
+#
+#   Add the `DDSSwiftLint` Plugin Package to your Package.swift file
+#
+#    dependencies: [
+#        .package(url: "https://github.com/GayleDunham/SwiftLintPlugin.git", branch: "main"),
+#    ],
+#
+#   Add the SwiftLintBuildTool Plugin to your targets
+#
+#    targets: [
+#        .target(
+#            name: "YOUR_TARGET",
+#            dependencies: [],
+#            plugins: [ .plugin(name: "SwiftLintBuildTool", package: "SwiftLintPlugin") ]
+#        ),
+#

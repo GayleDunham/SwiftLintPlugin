@@ -1,0 +1,134 @@
+#
+# Default DDS SwiftLint Configuration
+#
+#  Created by Gayle Dunham on 4/20/2020.
+#  Copyright © 2020-2023 Dirty Dog Software, LLC. All rights reserved.
+#
+# Reference:
+#   https://github.com/realm/SwiftLint
+#   https://github.com/realm/SwiftLint/blob/master/Rules.md
+#   https://dirtydogsoftware.atlassian.net/wiki/display/DT/Swift+Lint?src=contextnavpagetreemode
+#   https://www.avanderlee.com/optimization/swiftlint-optin-rules/
+
+# ===========================================================================================
+#                                   IMPORTANT
+#
+#   - Link this file to the Users Shared Directory
+#       `gdunham: SwiftLintPlugin % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/com.dirtydogsoftware.swiftlint.yml" /Users/Shared/com.dirtydogsoftware.swiftlint.yml`
+#
+#   - Link the swiftlint.yml file to ~/bin/Resources/ for uses in scripts
+#       `gdunham: SwiftLintPlugin % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/swiftlint.yml" ~/bin/Resources/swiftlint.yml`
+#
+# ===========================================================================================
+
+ # paths to ignore during linting.
+excluded:
+    - .build
+
+# rule identifiers to exclude from running
+disabled_rules:
+    - trailing_comma                        # I believe in trailing commas when building lists of things
+    - opening_brace
+    - vertical_parameter_alignment
+    - switch_case_alignment
+
+# some rules are only opt-in https://realm.github.io/SwiftLint/rule-directory.html
+opt_in_rules:
+    - array_init
+    - attributes
+    - closure_end_indentation
+    - closure_spacing
+    - collection_alignment
+    - convenience_type
+    - discouraged_object_literal
+    - empty_collection_literal
+    - empty_count
+    - empty_parentheses_with_trailing_closure
+    - empty_string
+    - enum_case_associated_values_count
+    - explicit_enum_raw_value
+    - fallthrough
+    - fatal_error_message
+    - file_name
+    - first_where
+    - force_unwrapping
+    - identical_operands
+    - implicitly_unwrapped_optional
+    - joined_default_parameter
+    - last_where
+    - legacy_random
+    - literal_expression_end_indentation
+    - missing_docs
+    - modifier_order
+    - multiline_function_chains
+    - multiline_literal_brackets
+    - multiple_closures_with_trailing_closure
+    - orphaned_doc_comment
+    - operator_usage_whitespace
+    - overridden_super_call
+    - pattern_matching_keywords
+    - prefer_self_type_over_type_of_self
+    - private_action
+    - private_outlet
+    - redundant_nil_coalescing
+    - redundant_type_annotation
+    - required_enum_case
+    - strict_fileprivate
+    - toggle_bool
+    - trailing_closure
+    - unavailable_function
+    - unneeded_parentheses_in_closure_argument
+    - yoda_condition
+
+# Rules run by `swiftlint analyze`. The swiftlint analyze command can lint Swift files using the
+# full type-checked AST (Abstract Syntax Trees).
+analyzer_rules:
+    - explicit_self
+    - unused_declaration
+    - unused_import
+
+# configurable rules can be customized from this configuration file
+line_length: 200
+function_body_length: 60
+file_length: 500
+
+# parameterized rules are first parameterized as a warning level, then error level.
+type_body_length:
+    - 400 # warning
+    - 500 # error
+
+colon:
+    flexible_right_spacing: true
+
+# x, y, and z are perfectly valid variable names
+identifier_name:
+    excluded:
+        - x
+        - y
+        - z
+        - i
+        - j
+        - k
+        - id
+        - to
+
+attributes:
+  always_on_same_line:
+    ["@IBOutlet", "@IBAction", "@IBSegueAction", "@NSManaged", "@Environment"]
+  always_on_line_above:
+    ["@ViewBuilder", "@discardableResult"]
+
+
+line_length:
+  ignores_urls: true
+  ignores_function_declarations: true
+  ignores_comments: true
+
+private_over_fileprivate:
+  validate_extensions: true
+
+force_cast: warning
+force_try: warning
+
+legacy_hashing: error
+
