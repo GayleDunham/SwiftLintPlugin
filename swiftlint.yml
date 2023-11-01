@@ -33,9 +33,16 @@ parent_config: /Users/Shared/com.dirtydogsoftware.swiftlint.yml
 #   Installation for Xcode Projects
 # ------------------------------------------------------------------------------------------------
 #
-#   1. Add the package `https://github.com/GayleDunham/SwiftLintPlugin` to the project.
-#
-#   2. Optionally: Add the `SwiftLintBuildTool` plugin to the targets you want to be evaluated by the linter.
+#   1. In the Project Navigator select the first item (The Project)
+#   2. In the Project Settings Editor select the Project
+#   3. Then select the Package Dependencies tab
+#   4. Click the + under the "Add package here" text
+#   5. Paste https://github.com/GayleDunham/SwiftLintPlugin.git in the search box.
+#   6. Click Add Package
+#   7. Now Select the Target
+#   8. Then select the Build Phases tab
+#   9. Expand Run Build Tool Plug-in and Click the +
+#  10. Select SwiftLintBuildTool and Click Add
 #
 
 # ------------------------------------------------------------------------------------------------
