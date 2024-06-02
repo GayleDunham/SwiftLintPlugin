@@ -31,6 +31,7 @@ disabled_rules:
     - opening_brace
     - vertical_parameter_alignment
     - switch_case_alignment
+    - non_optional_string_data_conversion
 
 # some rules are only opt-in https://realm.github.io/SwiftLint/rule-directory.html
 opt_in_rules:

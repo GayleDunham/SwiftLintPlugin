@@ -60,7 +60,7 @@ enum SwiftPluginTool {
         }
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: String.Encoding.utf8)
+        let output = String(data: data, encoding: .utf8)
 
         return .success(output ?? "")
     }
