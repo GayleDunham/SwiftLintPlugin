@@ -21,6 +21,10 @@
 #
 # ===========================================================================================
 
+# allow '_' in type names
+type_name:
+  allowed_symbols: "_"
+
  # paths to ignore during linting.
 excluded:
     - .build
