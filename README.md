@@ -4,7 +4,7 @@ A Swift Package Manager Plugin for SwiftLint, supporting both Swift Packages and
 
 # Installation
 
-This Package contains a `binaryTarget` for the current released version 0.55.1 of swiftlint from [https://github.com/realm/SwiftLint/](https://github.com/realm/SwiftLint/) used by all the plugin commands and the build tool command. No installation of swiftlint or configuring of PATH is required.
+This Package contains a `binaryTarget` for the current released version 0.57.0 of swiftlint from [https://github.com/realm/SwiftLint/](https://github.com/realm/SwiftLint/) used by all the plugin commands and the build tool command. No installation of swiftlint or configuring of PATH is required.
 
 > [!IMPORTANT]
 > You do need either a `swiftlint.yml` or `.swiftlint.yml` file in the root folder of your package or project. The commands will fail if no configuration file can be found.

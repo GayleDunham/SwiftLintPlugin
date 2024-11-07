@@ -3,7 +3,7 @@
 //  SwiftLintPlugin
 //
 //  Created by Gayle Dunham on 9/7/23.
-//  Copyright © 2023 Gayle Dunham
+//  Copyright © 2023-2024 Gayle Dunham
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,9 @@ import Foundation
 import PackagePlugin
 
 /// Command Plugin to run the lint --fix subcommand on the specified Targets
+///
+/// Package Command Plug-ins are effectively scripts that are compiled each time they are executed.
+///
 @main
 struct SwiftLintFix: CommandPlugin {
 
@@ -37,12 +40,12 @@ struct SwiftLintFix: CommandPlugin {
         let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
         let directories = context.package.targets.compactMap { $0.directory.string }
 
-        performFixCommand(tool: tool, outputDirectory: outputDirectory, targetDirectories: directories)
+        performFixCommand(tool: tool, outputDirectory: outputDirectory, inputPaths: directories)
     }
 
 }
 
-// Required for Xcode Projects
+// Support for Xcode Projects
 #if canImport(XcodeProjectPlugin)
 import XcodeProjectPlugin
 
@@ -53,10 +56,14 @@ extension SwiftLintFix: XcodeCommandPlugin {
 
         let tool = try context.tool(named: "swiftlint")
         let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
-        let targets = context.xcodeProject.targets
-        let directories = SwiftPluginTool.targetsDirectories(arguments: arguments, projectTargets: targets)
 
-        performFixCommand(tool: tool, outputDirectory: outputDirectory, targetDirectories: directories)
+        let targetNames = SwiftPluginTool.targetsNamesFrom(arguments: arguments)
+        let selectedTargets = context.xcodeProject.targets.filter { targetNames.contains($0.displayName) }
+
+        let flattenedInputFiles = selectedTargets.compactMap(\.inputFiles).reduce([], +)
+        let swiftFiles = flattenedInputFiles.filter(\File.isSwiftFile).map(\.path.string)
+
+        performFixCommand(tool: tool, outputDirectory: outputDirectory, inputPaths: swiftFiles)
     }
 }
 #endif
@@ -65,33 +72,22 @@ extension SwiftLintFix {
 
     /// Configure the Tool arguments and run the Tool
     func performFixCommand(tool: PackagePlugin.PluginContext.Tool, outputDirectory: PackagePlugin.Path,
-                           targetDirectories: [String]) {
+                           inputPaths: [String]) {
 
-        let configFile = findConfigurationFileIn(path: Path(FileManager.default.currentDirectoryPath))
+        var lintPaths = inputPaths
+        let configFile = FileManager.default.swiftlintConfigurationFile
+
+        if let excludes = FileManager.default.excludePaths(from: configFile) {
+            lintPaths = inputPaths.filter { !$0.contains(excludes) }
+        }
 
         let lintArgs = [
             "lint", "--fix",
             "--cache-path", outputDirectory.appending("cache").string,
-            "--config", configFile.string
-        ] + targetDirectories
+            "--config", FileManager.default.swiftlintConfigurationFile.string
+        ] + lintPaths
 
         let result = SwiftPluginTool.run(tool: tool, arguments: lintArgs)
         SwiftPluginTool.display(result: result)
     }
-
-    /// Find the swiftlint configuration file
-    func findConfigurationFileIn(path: Path) -> Path {
-
-        let configFile = [ "swiftlint.yml", ".swiftlint.yml"]
-            .compactMap { path.appending($0) }
-            .first { FileManager.default.fileExists(atPath: $0.string) }
-
-        guard let configFile else {
-           Diagnostics.error("Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(path)")
-            exit(1)
-        }
-
-        return configFile
-    }
-
 }

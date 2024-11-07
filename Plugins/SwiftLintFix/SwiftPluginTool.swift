@@ -3,7 +3,7 @@
 //  SwiftLintPlugin
 //
 //  Created by Gayle Dunham on 9/7/23.
-//  Copyright © 2023 Gayle Dunham
+//  Copyright © 2023-2024 Gayle Dunham
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,16 @@
 
 //
 // NOTICE:  I duplicated this file in all the command plugins (SwiftLintFix,
-//          SwiftLintLinter, SwiftLintRules, and SwiftLintVersion). As of Xcode 14
-//          and 15, I could not create a Library and use it in a plugin target
-//          in this package. I also tried listing the same file in multiple plugin
-//          sources array, also not allowed.
+//          SwiftLintLinter, SwiftLintRules, and SwiftLintVersion). As of Xcode 14, 15
+//          and 16, I could not create a Library and use it in a plugin target in this
+//          package. I tried listing the same file in multiple plugin sources array,
+//          also not allowed. I also tried symbolic links and hard links. Xcode kills
+//          hard links and does not follow symbolic links. So sad copy and paste it is.
 //
 
 import Foundation
 import PackagePlugin
+import RegexBuilder
 
 enum SwiftPluginTool {
 
@@ -96,52 +98,77 @@ import XcodeProjectPlugin
 
 extension SwiftPluginTool {
 
-    /// The array of Target directories for the targets the user selected as supplied by the arguments list.
-    static func targetsDirectories(arguments: [String], projectTargets: [XcodeProjectPlugin.XcodeTarget]) -> [String] {
-
-        let targetNames = SwiftPluginTool.targetsNamesFrom(arguments: arguments)
-
-        let targetDirectories = projectTargets
-            .filter { targetNames.contains($0.displayName) }
-            .compactMap { targetsDirectory(fileList: $0.inputFiles) }
-
-        return targetDirectories
-    }
-
     /// The array of Target names specified in the command arguments
     static func targetsNamesFrom(arguments: [String]) -> [String] {
         stride(from: 0, to: arguments.count - 1, by: 2).compactMap {
             (arguments[$0] == "--target" ? arguments[$0 + 1] : nil)
         }
     }
+}
+#endif
 
-    /// The directory found from the Target FileList that contains all the source files.
-    static func targetsDirectory(fileList: FileList) -> String {
+extension PackagePlugin.File {
 
-        let currentDirectory = FileManager.default.currentDirectoryPath
-        let path = (fileList.first { _ in true })?.path.removingLastComponent()
+    /// Determine if the file is source code and a ".swift" file
+    var isSwiftFile: Bool {
+        type == .source && path.isSwiftFile
+    }
+}
 
-        guard var path else {
-            Diagnostics.error("Unable to get a path from the FileList: \(fileList)")
+extension PackagePlugin.Path {
+
+    /// Determine if the path ends in ".swift"
+    var isSwiftFile: Bool {
+        lastComponent.hasSuffix(".swift")
+    }
+}
+
+extension FileManager {
+
+    /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml" and "swiftlint.yml"
+    /// file names are supported. The more visible "swiftlint.yml" is given preference if both exist.
+    var swiftlintConfigurationFile: Path {
+
+        let root = Path(currentDirectoryPath)
+
+        let configFile = [ "swiftlint.yml", ".swiftlint.yml"]
+            .compactMap { root.appending($0) }
+            .first { fileExists(atPath: $0.string) }
+
+        guard let configFile else {
+            Diagnostics.error("Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(root)")
             exit(1)
         }
 
-        let sourceFiles = fileList.filter { $0.type == .source }
-
-        var foundIt = false
-        var tries = 0
-        repeat {
-            foundIt = sourceFiles.allSatisfy { $0.path.string.contains(path.string) }
-
-            if !foundIt {
-                path = path.removingLastComponent()
-                tries += 1
-            }
-
-        } while (!foundIt || tries > 20 || currentDirectory == path.string )
-
-        return path.string
+        return configFile
     }
 
+    /// Read the swiftlint configuration file and get the exclude setting.
+    func excludePaths(from configFile: Path) -> Regex<AnyRegexOutput>? {
+
+        let contents = try? String(contentsOfFile: configFile.string, encoding: .utf8)
+
+        let excludeMatcher = Regex {
+            ZeroOrMore(.newlineSequence)
+            "excluded:"
+            ZeroOrMore(.whitespace)
+            Capture(
+                OneOrMore(.any, .reluctant)
+            )
+            One(.newlineSequence)
+            ZeroOrMore(.whitespace)
+            OneOrMore(.newlineSequence)
+        }
+
+        if let match = contents?.firstMatch(of: excludeMatcher) {
+
+            let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
+            let excludes = trimmed.split(separator: "- ").map( {String($0)} )
+
+            let excludeRegex = try? Regex(excludes.joined(separator: "|"))
+            return excludeRegex
+        }
+
+        return nil
+    }
 }
-#endif

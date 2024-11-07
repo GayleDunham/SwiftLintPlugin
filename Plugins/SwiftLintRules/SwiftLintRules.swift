@@ -2,14 +2,17 @@
 //  SwiftLintRules.swift
 //  SwiftLintPlugin
 //
-//  Created by Gayle Dunham on 9/18/22.
-//  Copyright © 2022 Dirty Dog Software, LLC. All rights reserved.
+//  Created by Gayle Dunham on 9/7/23.
+//  Copyright © 2023-2024 Dirty Dog Software, LLC. All rights reserved.
 //
 
 import Foundation
 import PackagePlugin
 
 /// Command Plugin to run the rules subcommand on the specified Targets
+///
+/// Package Command Plug-ins are effectively scripts that are compiled each time they are executed.
+///
 @main
 struct SwiftLintRules: CommandPlugin {
 
@@ -20,7 +23,7 @@ struct SwiftLintRules: CommandPlugin {
     }
 }
 
-// Required for Xcode Projects
+// Support for Xcode Projects
 #if canImport(XcodeProjectPlugin)
 import XcodeProjectPlugin
 
