@@ -163,7 +163,7 @@ extension FileManager {
         if let match = contents?.firstMatch(of: excludeMatcher) {
 
             let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
-            let excludes = trimmed.split(separator: "- ").map( {String($0)} )
+            let excludes = trimmed.split(separator: "- ").map { String($0) }
 
             let excludeRegex = try? Regex(excludes.joined(separator: "|"))
             return excludeRegex
