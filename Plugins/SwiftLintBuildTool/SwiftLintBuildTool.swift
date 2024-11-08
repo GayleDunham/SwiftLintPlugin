@@ -40,8 +40,8 @@ struct SwiftLintBuildTool: BuildToolPlugin {
     func createBuildCommands(context: PluginContext, target: Target) async throws -> [Command] {
 
         let tool = try context.tool(named: "swiftlint")
-        let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
-        let directory = target.directory.string
+        let outputDirectory = context.pluginWorkDirectoryURL.appendingPathComponent("swiftlint")
+        let directory = (target as? SwiftSourceModuleTarget)?.directoryURL.relativePath ?? "."
 
         return createPreBuildCommands(tool: tool, outputDirectory: outputDirectory, inputPaths: [directory])
     }
@@ -57,8 +57,8 @@ extension SwiftLintBuildTool: XcodeBuildToolPlugin {
     func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
 
         let tool = try context.tool(named: "swiftlint")
-        let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
-        let swiftFiles = target.inputFiles.filter(\.isSwiftFile).map(\.path.string)
+        let outputDirectory = context.pluginWorkDirectoryURL.appendingPathComponent("swiftlint")
+        let swiftFiles = target.inputFiles.filter(\.isSwiftFile).compactMap(\.url.relativePath)
 
         return createPreBuildCommands(tool: tool, outputDirectory: outputDirectory, inputPaths: swiftFiles)
     }
@@ -68,25 +68,25 @@ extension SwiftLintBuildTool: XcodeBuildToolPlugin {
 extension SwiftLintBuildTool {
 
     /// Function to create the Prebuild Command that the Build Phase will execute
-    func createPreBuildCommands(tool: PackagePlugin.PluginContext.Tool, outputDirectory: PackagePlugin.Path,
+    func createPreBuildCommands(tool: PackagePlugin.PluginContext.Tool, outputDirectory: URL,
                                 inputPaths: [String]) -> [Command] {
 
-        var lintPaths = inputPaths
+        var lintFiles = inputPaths
         let configFile = FileManager.default.swiftlintConfigurationFile
 
         if let excludes = FileManager.default.excludePaths(from: configFile) {
-            lintPaths = inputPaths.filter { !$0.contains(excludes) }
+            lintFiles = inputPaths.filter { !$0.contains(excludes) }
         }
 
         return [
             .prebuildCommand(
                 displayName: "SwiftLint BuildTool Plugin",
-                executable: tool.path,
+                executable: tool.url,
                 arguments: [
                     "lint",
                     "--config", configFile,
-                    "--cache-path", outputDirectory.appending("cache").string
-                ] + lintPaths,
+                    "--cache-path", outputDirectory.appendingPathComponent("cache").relativePath
+                ] + lintFiles,
                 outputFilesDirectory: outputDirectory
             )
         ]
@@ -98,15 +98,15 @@ extension PackagePlugin.File {
 
     /// Determine if the file is source code and a ".swift" file
     var isSwiftFile: Bool {
-        type == .source && path.isSwiftFile
+        type == .source && url.isSwiftFile
     }
 }
 
-extension PackagePlugin.Path {
+extension URL {
 
-    /// Determine if the path ends in ".swift"
+    /// Determine if the is a file and has the extension swift
     var isSwiftFile: Bool {
-        lastComponent.hasSuffix(".swift")
+        isFileURL && pathExtension == "swift"
     }
 }
 
@@ -114,16 +114,16 @@ extension FileManager {
 
     /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml" and "swiftlint.yml"
     /// file names are supported. The more visible "swiftlint.yml" is given preference if both exist.
-    var swiftlintConfigurationFile: Path {
+    var swiftlintConfigurationFile: String {
 
-        let root = Path(currentDirectoryPath)
-
-        let configFile = [ "swiftlint.yml", ".swiftlint.yml"]
-            .compactMap { root.appending($0) }
-            .first { fileExists(atPath: $0.string) }
+        let configFile = [ "/swiftlint.yml", "/.swiftlint.yml"]
+            .compactMap { currentDirectoryPath + $0 }
+            .first { fileExists(atPath: $0) }
 
         guard let configFile else {
-            Diagnostics.error("Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(root)")
+            Diagnostics.error("""
+            Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(currentDirectoryPath)
+            """)
             exit(1)
         }
 
@@ -131,9 +131,9 @@ extension FileManager {
     }
 
     /// Read the swiftlint configuration file and get the exclude setting.
-    func excludePaths(from configFile: Path) -> Regex<AnyRegexOutput>? {
+    func excludePaths(from configFile: String) -> Regex<AnyRegexOutput>? {
 
-        let contents = try? String(contentsOfFile: configFile.string, encoding: .utf8)
+        let contents = try? String(contentsOfFile: configFile, encoding: .utf8)
 
         let excludeMatcher = Regex {
             ZeroOrMore(.newlineSequence)
@@ -150,7 +150,7 @@ extension FileManager {
         if let match = contents?.firstMatch(of: excludeMatcher) {
 
             let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
-            let excludes = trimmed.split(separator: "- ").map( {String($0)} )
+            let excludes = trimmed.split(separator: "- ").map { String($0) }
 
             let excludeRegex = try? Regex(excludes.joined(separator: "|"))
             return excludeRegex

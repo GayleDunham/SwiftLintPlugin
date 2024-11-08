@@ -37,8 +37,9 @@ struct SwiftLintFix: CommandPlugin {
     func performCommand(context: PluginContext, arguments: [String]) async throws {
 
         let tool = try context.tool(named: "swiftlint")
-        let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
-        let directories = context.package.targets.compactMap { $0.directory.string }
+        let outputDirectory = context.pluginWorkDirectoryURL.appendingPathComponent("swiftlint")
+        let targets = context.package.targets.compactMap { $0 as? SwiftSourceModuleTarget }
+        let directories = targets.map(\.directoryURL.relativePath)
 
         performFixCommand(tool: tool, outputDirectory: outputDirectory, inputPaths: directories)
     }
@@ -55,13 +56,13 @@ extension SwiftLintFix: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
 
         let tool = try context.tool(named: "swiftlint")
-        let outputDirectory = context.pluginWorkDirectory.appending("swiftlint")
+        let outputDirectory = context.pluginWorkDirectoryURL.appendingPathComponent("swiftlint")
 
         let targetNames = SwiftPluginTool.targetsNamesFrom(arguments: arguments)
         let selectedTargets = context.xcodeProject.targets.filter { targetNames.contains($0.displayName) }
 
         let flattenedInputFiles = selectedTargets.compactMap(\.inputFiles).reduce([], +)
-        let swiftFiles = flattenedInputFiles.filter(\File.isSwiftFile).map(\.path.string)
+        let swiftFiles = flattenedInputFiles.filter(\File.isSwiftFile).map(\.url.relativePath)
 
         performFixCommand(tool: tool, outputDirectory: outputDirectory, inputPaths: swiftFiles)
     }
@@ -71,7 +72,7 @@ extension SwiftLintFix: XcodeCommandPlugin {
 extension SwiftLintFix {
 
     /// Configure the Tool arguments and run the Tool
-    func performFixCommand(tool: PackagePlugin.PluginContext.Tool, outputDirectory: PackagePlugin.Path,
+    func performFixCommand(tool: PackagePlugin.PluginContext.Tool, outputDirectory: URL,
                            inputPaths: [String]) {
 
         var lintPaths = inputPaths
@@ -83,8 +84,8 @@ extension SwiftLintFix {
 
         let lintArgs = [
             "lint", "--fix",
-            "--cache-path", outputDirectory.appending("cache").string,
-            "--config", FileManager.default.swiftlintConfigurationFile.string
+            "--cache-path", outputDirectory.appendingPathComponent("cache").relativePath,
+            "--config", FileManager.default.swiftlintConfigurationFile
         ] + lintPaths
 
         let result = SwiftPluginTool.run(tool: tool, arguments: lintArgs)

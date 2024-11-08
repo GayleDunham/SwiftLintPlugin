@@ -41,10 +41,8 @@ enum SwiftPluginTool {
     /// Run the Tool and return a `Result`
     static func run(tool: PackagePlugin.PluginContext.Tool, arguments: [String]) -> Result<String, ToolError> {
 
-        let toolUrl = URL(fileURLWithPath: tool.path.string)
-
         let task = Process()
-        task.executableURL = toolUrl
+        task.executableURL = tool.url
         task.arguments = arguments
 
         let pipe = Pipe()
@@ -111,15 +109,15 @@ extension PackagePlugin.File {
 
     /// Determine if the file is source code and a ".swift" file
     var isSwiftFile: Bool {
-        type == .source && path.isSwiftFile
+        type == .source && url.isSwiftFile
     }
 }
 
-extension PackagePlugin.Path {
+extension URL {
 
-    /// Determine if the path ends in ".swift"
+    /// Determine if the is a file and has the extension swift
     var isSwiftFile: Bool {
-        lastComponent.hasSuffix(".swift")
+        isFileURL && pathExtension == "swift"
     }
 }
 
@@ -127,16 +125,16 @@ extension FileManager {
 
     /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml" and "swiftlint.yml"
     /// file names are supported. The more visible "swiftlint.yml" is given preference if both exist.
-    var swiftlintConfigurationFile: Path {
+    var swiftlintConfigurationFile: String {
 
-        let root = Path(currentDirectoryPath)
-
-        let configFile = [ "swiftlint.yml", ".swiftlint.yml"]
-            .compactMap { root.appending($0) }
-            .first { fileExists(atPath: $0.string) }
+        let configFile = [ "/swiftlint.yml", "/.swiftlint.yml"]
+            .compactMap { currentDirectoryPath + $0 }
+            .first { fileExists(atPath: $0) }
 
         guard let configFile else {
-            Diagnostics.error("Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(root)")
+            Diagnostics.error("""
+            Error could not find config file: 'swiftlint.yml' or '.swiftlint.yml' in path: \(currentDirectoryPath)
+            """)
             exit(1)
         }
 
@@ -144,9 +142,9 @@ extension FileManager {
     }
 
     /// Read the swiftlint configuration file and get the exclude setting.
-    func excludePaths(from configFile: Path) -> Regex<AnyRegexOutput>? {
+    func excludePaths(from configFile: String) -> Regex<AnyRegexOutput>? {
 
-        let contents = try? String(contentsOfFile: configFile.string, encoding: .utf8)
+        let contents = try? String(contentsOfFile: configFile, encoding: .utf8)
 
         let excludeMatcher = Regex {
             ZeroOrMore(.newlineSequence)
@@ -163,7 +161,7 @@ extension FileManager {
         if let match = contents?.firstMatch(of: excludeMatcher) {
 
             let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
-            let excludes = trimmed.split(separator: "- ").map( {String($0)} )
+            let excludes = trimmed.split(separator: "- ").map { String($0) }
 
             let excludeRegex = try? Regex(excludes.joined(separator: "|"))
             return excludeRegex

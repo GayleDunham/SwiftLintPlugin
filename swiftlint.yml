@@ -27,7 +27,7 @@ parent_config: /Users/Shared/com.dirtydogsoftware.swiftlint.yml
 
 # Example to Ignore Core Data generated `NSManagedObject` subclasses during linting.
 #excluded:
-#    - "Inventory/Models/Generated Code/"
+#    - Inventory/Models/GeneratedCode/
 
 # ------------------------------------------------------------------------------------------------
 #   Installation for Xcode Projects
