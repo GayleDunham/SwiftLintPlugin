@@ -14,10 +14,13 @@
 #                                   IMPORTANT
 #
 #   - Link this file to the Users Shared Directory
-#       `gdunham: SwiftLintPlugin % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/com.dirtydogsoftware.swiftlint.yml" /Users/Shared/com.dirtydogsoftware.swiftlint.yml`
+#
+#   gdunham % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/com.dirtydogsoftware.swiftlint.yml" /Users/Shared/com.dirtydogsoftware.swiftlint.yml
 #
 #   - Link the swiftlint.yml file to ~/bin/Resources/ for uses in scripts
-#       `gdunham: SwiftLintPlugin % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/swiftlint.yml" ~/bin/Resources/swiftlint.yml`
+#
+#   gdunham % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/swiftlint.yml" ~/bin/Resources/swiftlint.yml`
+#
 #
 # ===========================================================================================
 
@@ -93,7 +96,6 @@ analyzer_rules:
     - unused_import
 
 # configurable rules can be customized from this configuration file
-line_length: 200
 function_body_length: 60
 file_length: 500
 
@@ -104,6 +106,9 @@ type_body_length:
 
 colon:
     flexible_right_spacing: true
+
+empty_count:
+    only_after_dot: true
 
 # x, y, and z are perfectly valid variable names
 identifier_name:
@@ -123,8 +128,9 @@ attributes:
   always_on_line_above:
     ["@ViewBuilder", "@discardableResult"]
 
-
 line_length:
+  warning: 120
+  error: 200
   ignores_urls: true
   ignores_function_declarations: true
   ignores_comments: true
