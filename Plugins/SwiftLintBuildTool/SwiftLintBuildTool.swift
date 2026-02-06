@@ -78,6 +78,11 @@ extension SwiftLintBuildTool {
             lintFiles = inputPaths.filter { !$0.contains(excludes) }
         }
 
+        guard !lintFiles.isEmpty else {
+            Diagnostics.error("Error the list of files to lint is empty.")
+            exit(2)
+        }
+
         return [
             .prebuildCommand(
                 displayName: "SwiftLint BuildTool Plugin",
@@ -137,7 +142,7 @@ extension FileManager {
 
         let excludeMatcher = Regex {
             ZeroOrMore(.newlineSequence)
-            "excluded:"
+            #"[^\h]excluded:"#
             ZeroOrMore(.whitespace)
             Capture(
                 OneOrMore(.any, .reluctant)
