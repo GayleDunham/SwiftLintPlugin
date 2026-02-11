@@ -41,7 +41,14 @@ extension SwiftLintRules {
 
     /// Configure the Tool arguments and run the Tool
     func performRulesCommand(tool: PackagePlugin.PluginContext.Tool) {
-        let result = SwiftPluginTool.run(tool: tool, arguments: ["rules"])
+        let configFile = FileManager.default.swiftlintConfigurationFile
+
+        let lintArgs: [String] = [
+            "rules",
+            "--config", FileManager.default.swiftlintConfigurationFile,
+        ]
+
+        let result = SwiftPluginTool.run(tool: tool, arguments: lintArgs)
         SwiftPluginTool.display(result: result)
     }
 }
