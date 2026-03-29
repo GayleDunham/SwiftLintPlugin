@@ -8,19 +8,24 @@ let package = Package(
     products: [
         .plugin(
             name: "SwiftLintBuildTool",
-            targets: ["SwiftLintBuildTool"]),
+            targets: ["SwiftLintBuildTool"]
+        ),
         .plugin(
             name: "SwiftLintLinter",
-            targets: ["SwiftLintLinter"]),
+            targets: ["SwiftLintLinter"]
+        ),
         .plugin(
             name: "SwiftLintFix",
-            targets: ["SwiftLintFix"]),
+            targets: ["SwiftLintFix"]
+        ),
         .plugin(
             name: "SwiftLintRules",
-            targets: ["SwiftLintRules"]),
+            targets: ["SwiftLintRules"]
+        ),
         .plugin(
             name: "SwiftLintVersion",
-            targets: ["SwiftLintVersion"]),
+            targets: ["SwiftLintVersion"]
+        ),
     ],
 
     targets: [
@@ -31,7 +36,6 @@ let package = Package(
         ),
         .target(
             name: "DDSSwiftLint",
-            dependencies: [],
             path: "Plugins",
             sources: ["DDSSwiftLint.swift", "../swiftlint.yml"],
             plugins: [ .plugin(name: "SwiftLintBuildTool") ]
@@ -46,7 +50,8 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "swiftlint-lint",
-                    description: "Print lint warnings and errors.")
+                    description: "Print lint warnings and errors."
+                )
             ),
             dependencies: ["SwiftLintBinary"]
         ),
@@ -55,7 +60,8 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "swiftlint-fix",
-                    description: "Correct linter violations if possible."),
+                    description: "Correct linter violations if possible."
+                ),
                 permissions: [.writeToPackageDirectory(reason: "This command attempts to fix lint issues")]
             ),
             dependencies: ["SwiftLintBinary"]
@@ -65,7 +71,8 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "swiftlint-rules",
-                    description: "Display the list of SwiftLint rules and their identifiers.")
+                    description: "Display the list of SwiftLint rules and their identifiers."
+                )
             ),
             dependencies: ["SwiftLintBinary"]
         ),
@@ -74,9 +81,11 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "swiftlint-version",
-                    description: "Display the current version of SwiftLint.")
+                    description: "Display the current version of SwiftLint."
+                )
             ),
             dependencies: ["SwiftLintBinary"]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v5, .v6]
 )

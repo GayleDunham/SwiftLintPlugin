@@ -3,7 +3,7 @@
 //  SwiftLintPlugin
 //
 //  Created by Gayle Dunham on 9/7/23.
-//  Copyright © 2023-2024 Gayle Dunham
+//  Copyright © 2023-2026 Gayle Dunham
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -99,6 +99,8 @@ extension SwiftLintBuildTool {
 
 }
 
+// MARK: - Is Swift File
+
 extension PackagePlugin.File {
 
     /// Determine if the file is source code and a ".swift" file
@@ -115,10 +117,13 @@ extension URL {
     }
 }
 
+// MARK: - Configuration File Support
+
 extension FileManager {
 
-    /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml" and "swiftlint.yml"
-    /// file names are supported. The more visible "swiftlint.yml" is given preference if both exist.
+    /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml"
+    /// and "swiftlint.yml" file names are supported. The more visible "swiftlint.yml" is
+    /// given preference if both exist.
     var swiftlintConfigurationFile: String {
 
         let configFile = [ "/swiftlint.yml", "/.swiftlint.yml"]
@@ -141,8 +146,8 @@ extension FileManager {
         let contents = try? String(contentsOfFile: configFile, encoding: .utf8)
 
         let excludeMatcher = Regex {
-            ZeroOrMore(.newlineSequence)
-            #"[^\h]excluded:"#
+            Anchor.startOfLine
+            "excluded:"
             ZeroOrMore(.whitespace)
             Capture(
                 OneOrMore(.any, .reluctant)
@@ -151,13 +156,17 @@ extension FileManager {
             ZeroOrMore(.whitespace)
             OneOrMore(.newlineSequence)
         }
+        .anchorsMatchLineEndings()
 
         if let match = contents?.firstMatch(of: excludeMatcher) {
 
             let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
-            let excludes = trimmed.split(separator: "- ").map { String($0) }
+            let excludes = trimmed.split(separator: "- ")
+                .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
 
-            let excludeRegex = try? Regex(excludes.joined(separator: "|"))
+            let escapedExcludes = excludes.map { NSRegularExpression.escapedPattern(for: $0) }
+            let excludeRegex = try? Regex(escapedExcludes.joined(separator: "|"))
             return excludeRegex
         }
 

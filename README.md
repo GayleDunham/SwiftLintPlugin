@@ -1,19 +1,28 @@
 # SwiftLintPlugin
-A Swift Package Manager Plugin for SwiftLint, supporting both Swift Packages and Xcode Projects. This package provides both plugin commands and a build tool command that runs before the build. For Packages, the plugin commands can be executed from both the command line and within Xcode.
 
+A Swift Package Manager plugin for SwiftLint, supporting both Swift Packages and Xcode Projects.
 
-# Installation
+This package provides plugin commands and a build tool command. The build tool runs SwiftLint before each build, and any issues are displayed in the Xcode Issue Navigator and code editor. For Swift Packages, the plugin commands can be executed from either the command line or within Xcode.
 
-This Package contains a `binaryTarget` for the current released version 0.57.0 of swiftlint from [https://github.com/realm/SwiftLint/](https://github.com/realm/SwiftLint/) used by all the plugin commands and the build tool command. No installation of swiftlint or configuring of PATH is required.
+These plugins respect the `exclude:` section in the top-level SwiftLint configuration file.
 
-> [!IMPORTANT]
-> You do need either a `swiftlint.yml` or `.swiftlint.yml` file in the root folder of your package or project. The commands will fail if no configuration file can be found.
+## Requirements
 
-For more information on SwiftLint Rules see: [https://realm.github.io/SwiftLint/rule-directory.html](https://realm.github.io/SwiftLint/rule-directory.html)
+- **Recommended**: Xcode 16 or later, but you can use Xcode 14 or 15 by specifying branch `swift-5.7`
 
-# Swift Package Configuration
+- **Recommended**: Swift 6.0 or later, but you can use Swift 5.7 or later by specifying branch `swift-5.7`
 
-1. Add this Package `SwiftLintPlugin` as a dependency of your Package.
+- **Required**: You must have a SwiftLint configuration file (`swiftlint.yml` or `.swiftlint.yml`) in the root folder of your package or project.
+
+## Installation
+
+This package contains a `binaryTarget` for the current released version 0.63.2 of SwiftLint from [realm/SwiftLint](https://github.com/realm/SwiftLint/), used by all the plugin commands and the build tool command. No installation of SwiftLint or configuring of PATH is required.
+
+For more information on SwiftLint rules, see the [Rule Directory Reference](https://realm.github.io/SwiftLint/rule-directory.html).
+
+## Adding Linting to a Swift Package
+
+1. Add `SwiftLintPlugin` as a dependency of your package.
 
 ```swift
     dependencies: [
@@ -21,7 +30,7 @@ For more information on SwiftLint Rules see: [https://realm.github.io/SwiftLint/
     ],
 ```
 
-2. Optionally: Add the `SwiftLintBuildTool` plugin to your main target all files in the package will be evaluated by the linter.
+2. Optionally, add the `SwiftLintBuildTool` plugin to your main target. All files in the package will be evaluated by the linter.
 
 ```swift
     targets: [
@@ -32,100 +41,95 @@ For more information on SwiftLint Rules see: [https://realm.github.io/SwiftLint/
         ),
 ```
 
+## Adding Linting to an Xcode Project
 
-# Xcode Project Configuration
+### TL;DR
 
-### TL;)DR
+1. Add the package `https://github.com/GayleDunham/SwiftLintPlugin` to the project.
+2. Optionally, add the `SwiftLintBuildTool` plugin to the targets you want to be evaluated by the linter.
 
-1. Add the package `https://github.com/GayleDunham/SwiftLintPlugin` to the project. 
-2. Optionally: Add the `SwiftLintBuildTool` plugin to the targets you want to be evaluated by the linter.
+### Add the Package to Your Project
 
-####
-
-### Add the package to your Project.
-
-1. In the Project Navigator select the first item (The Project)
-2. In the Project Settings Editor select the Project
-3. Then select the Package Dependencies tab
-4. Click the + under the "Add package here" text
+1. In the Project Navigator, select the first item (the project).
+2. In the Project Settings editor, select the project.
+3. Select the Package Dependencies tab.
+4. Click the + under the "Add package here" text.
 
 ![Edit the Project Package Settings](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/59d09a38-8cce-45fc-a833-b0e6c81bf3d6)
 
-5. Paste https://github.com/GayleDunham/SwiftLintPlugin in the search box.
-6. Click Add Package
+5. Paste `https://github.com/GayleDunham/SwiftLintPlugin` in the search box.
+6. Click Add Package.
 
 ![Paste the link and Add Package](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/ee794f81-62d9-4088-a289-0e8814816ee7)
 
-### Optionally: Add the Build Tool to your Target.
+### Optionally: Add the Build Tool to Your Target
 
-7. Now Select the Target
-8. Then select the Build Phases tab
-9. Expand Run Build Tool Plug-in and Click the +
+7. Select the target.
+8. Select the Build Phases tab.
+9. Expand Run Build Tool Plug-in and click the +.
 
-![Edit the Target Build Setings](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/5a415120-be99-49f1-b988-c6a39fa1de93)
+![Edit the Target Build Settings](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/5a415120-be99-49f1-b988-c6a39fa1de93)
 
-10. Select SwiftLintBuildTool and Click Add
+10. Select SwiftLintBuildTool and click Add.
 
 ![Select the Build Tool and Add](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/1f918208-fbe3-4821-9fbf-864ab5c44d53)
 
-# Features 
+## Features
 
-## Build Tool
+### Build Tool
 
-The `SwiftLintBuildTool` is a pre-build command that runs swiftlint against a Target's sources directory. You must have a `swiftlint.yml` or `.swiftlint.yml` file in the root folder of the Package or Project
+The `SwiftLintBuildTool` is a pre-build command that runs SwiftLint against a target's sources directory. All lint issues are displayed in the Xcode Issue Navigator and code editor.
 
-## Commands
+### Commands
 
-Commands are run against one or more selected Targets
+Commands are run against one or more selected targets. Output appears in the Report Navigator, labeled with the command name (e.g., "SwiftLintFix").
 
-- `SwiftLintFix`:       Correct violations whenever possible
-- `SwiftLintLinter`:    Print lint warnings and errors
-- `SwiftLintRules`:     Display the list of rules and their identifiers
-- `SwiftLintVersion`:   Display the current version of SwiftLint
+- `SwiftLintFix`:       Modifies your files to correct lint violations if possible
+- `SwiftLintLinter`:    Prints lint warnings and errors
+- `SwiftLintRules`:     Displays the list of rules and their identifiers
+- `SwiftLintVersion`:   Displays the current version of SwiftLint
 
+## Running Plugin Commands from Xcode
 
-# Running Plugin Commands from Xcode
-
-* To Run Commands from the Project Navigator: Right-click on the first item (The Project or Package) in the Project Navigator, then Click the Command to run.
+* **From the Project Navigator:** Right-click on the first item (the project or package) in the Project Navigator, then click the command to run.
 
 ![Run Command from Project Navigator](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/32e94147-4729-4245-b273-e8d3460f250c)
 
+* **From the Menu:** Select the first item (the project or package) in the Project Navigator. Then in the menu bar, select File > Packages and the command to run.
 
-* To Run Commands from the Menu: Select the first item (The Project or Package) in the Project Navigator. Then in the Menu, Select File -> Packages and the Command to run.
+![Run Command from Menu](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/2c9b173b-b889-470d-a64c-6711fa41cbf5)
 
-![Run Command from Project Navigator](https://github.com/GayleDunham/SwiftLintPlugin/assets/4434375/2c9b173b-b889-470d-a64c-6711fa41cbf5)
+## Command Line Usage for Swift Packages
 
-# Command Line Usage For Swift Packages
-
-In the top-level directory of the Swift Package execute any of the following commands.
+In the top-level directory of the Swift Package, execute any of the following commands.
 
 ```sh
-    % swift package swiftlint-fix
-    % swift package swiftlint-lint
-    % swift package swiftlint-rules
-    % swift package swiftlint-version   
+swift package swiftlint-fix
+swift package swiftlint-lint
+swift package swiftlint-rules
+swift package swiftlint-version
 ```
 
-# xcodebuild Usage and CI systems
-
-> [!NOTE]
-> For CI Systems you should specify -skipPackagePluginValidation to skip the validation prompt that occurs in Xcode.
+## xcodebuild Usage and CI Systems
 
 ```sh
 xcodebuild  \
     -scheme "YOUR_PROJECT" \
-    -destination "platform=OS X,arch=x86_64" \
+    -destination "platform=macOS" \
     -skipPackagePluginValidation \
     clean build
 ```
 
-####
+> [!NOTE]
+> For CI systems, specify `-skipPackagePluginValidation` to skip the validation prompt that occurs in Xcode.
 
-# References:
+## References
 
 ### SwiftLint
 
 * SwiftLint Rule Directory Reference - [https://realm.github.io/SwiftLint/rule-directory.html](https://realm.github.io/SwiftLint/rule-directory.html)
+
+### Example SwiftLint Configuration Files from Industry Leaders
 
 * The Official raywenderlich.com SwiftLint Policy - [https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown ](https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown)
      

@@ -3,7 +3,7 @@
 //  SwiftLintPlugin
 //
 //  Created by Gayle Dunham on 9/7/23.
-//  Copyright © 2023-2024 Gayle Dunham
+//  Copyright © 2023-2026 Gayle Dunham
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -61,8 +61,7 @@ extension SwiftLintFix: XcodeCommandPlugin {
         let targetNames = SwiftPluginTool.targetsNamesFrom(arguments: arguments)
         let selectedTargets = context.xcodeProject.targets.filter { targetNames.contains($0.displayName) }
 
-        let flattenedInputFiles = selectedTargets.compactMap(\.inputFiles).reduce([], +)
-        let swiftFiles = flattenedInputFiles.filter(\File.isSwiftFile).map(\.url.relativePath)
+        let swiftFiles = selectedTargets.flatMap(\.inputFiles).filter(\.isSwiftFile).map(\.url.relativePath)
 
         performFixCommand(tool: tool, outputDirectory: outputDirectory, inputPaths: swiftFiles)
     }
@@ -82,13 +81,22 @@ extension SwiftLintFix {
             lintPaths = inputPaths.filter { !$0.contains(excludes) }
         }
 
-        let lintArgs = [
+        guard !lintPaths.isEmpty else {
+            Diagnostics.error("Error the list of directories to lint is empty.")
+            return
+        }
+
+        let process = Process()
+        process.executableURL = tool.url
+        process.arguments = [
             "lint", "--fix",
             "--cache-path", outputDirectory.appendingPathComponent("cache").relativePath,
-            "--config", FileManager.default.swiftlintConfigurationFile
+            "--config", configFile
         ] + lintPaths
 
-        let result = SwiftPluginTool.run(tool: tool, arguments: lintArgs)
-        SwiftPluginTool.display(result: result)
+        print()
+        try? process.run()
+        process.waitUntilExit()
+        print()
     }
 }

@@ -3,7 +3,7 @@
 //  SwiftLintPlugin
 //
 //  Created by Gayle Dunham on 9/7/23.
-//  Copyright © 2023-2024 Gayle Dunham
+//  Copyright © 2023-2026 Gayle Dunham
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,77 +24,24 @@
 //  SOFTWARE.
 
 //
-// NOTICE:  I duplicated this file in all the command plugins (SwiftLintFix,
-//          SwiftLintLinter, SwiftLintRules, and SwiftLintVersion). As of Xcode 14, 15
-//          and 16, I could not create a Library and use it in a plugin target in this
-//          package. I tried listing the same file in multiple plugin sources array,
-//          also not allowed. I also tried symbolic links and hard links. Xcode kills
-//          hard links and does not follow symbolic links. So sad copy and paste it is.
+// NOTICE:  I duplicated this file in the following command plugins (SwiftLintFix,
+//          SwiftLintLinter, and SwiftLintRules). As of Xcode 14, 15, 16, and 26,
+//          I could not create a Library and use it in a plugin target in this package.
+//          I tried listing the same file in multiple plugin sources array, that is
+//          also not allowed. I then tried symbolic links and hard links. Xcode kills
+//          hard links and does not follow symbolic links. So sad, copy and paste it is.
 //
 
 import Foundation
 import PackagePlugin
 import RegexBuilder
 
-enum SwiftPluginTool {
-
-    /// Run the Tool and return a `Result`
-    static func run(tool: PackagePlugin.PluginContext.Tool, arguments: [String]) -> Result<String, ToolError> {
-
-        let task = Process()
-        task.executableURL = tool.url
-        task.arguments = arguments
-
-        let pipe = Pipe()
-        task.standardOutput = pipe
-
-        try? task.run()
-        task.waitUntilExit()
-
-        // Check for errors in the subprocess.
-        if task.terminationReason != .exit || task.terminationStatus != 0 {
-
-            let problem = "\(task.terminationReason):\(task.terminationStatus)"
-            let message = "swiftlint invocation failed: \(problem)"
-            return .failure(.runFailed(message))
-        }
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
-
-        return .success(output ?? "")
-    }
-
-    /// Display the result of running the command
-    static func display(result: Result<String, ToolError>, prefix: String = "") {
-        switch result {
-        case .success(let message):
-            print("\(prefix)\(message)")
-        case .failure(let error):
-            Diagnostics.error(error.localizedDescription)
-        }
-    }
-
-    /// `ToolError` is the `Error` Type used for returned `Result`
-    enum ToolError: Error, LocalizedError {
-        case runFailed(String)
-
-        public var errorDescription: String? {
-            switch self {
-            case .runFailed(let problem):
-                return NSLocalizedString("swiftlint invocation failed: \(problem)", comment: "")
-            }
-        }
-    }
-
-}
-
 // MARK: - XcodeProject Target Support
 
 #if canImport(XcodeProjectPlugin)
 import XcodeProjectPlugin
 
-extension SwiftPluginTool {
+enum SwiftPluginTool {
 
     /// The array of Target names specified in the command arguments
     static func targetsNamesFrom(arguments: [String]) -> [String] {
@@ -104,6 +51,8 @@ extension SwiftPluginTool {
     }
 }
 #endif
+
+// MARK: - Is Swift File
 
 extension PackagePlugin.File {
 
@@ -121,10 +70,13 @@ extension URL {
     }
 }
 
+// MARK: - Configuration File Support
+
 extension FileManager {
 
-    /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml" and "swiftlint.yml"
-    /// file names are supported. The more visible "swiftlint.yml" is given preference if both exist.
+    /// Get the swiftlint configuration file from the current directory. Both ".swiftlint.yml"
+    /// and "swiftlint.yml" file names are supported. The more visible "swiftlint.yml" is
+    /// given preference if both exist.
     var swiftlintConfigurationFile: String {
 
         let configFile = [ "/swiftlint.yml", "/.swiftlint.yml"]
@@ -147,7 +99,7 @@ extension FileManager {
         let contents = try? String(contentsOfFile: configFile, encoding: .utf8)
 
         let excludeMatcher = Regex {
-            ZeroOrMore(.newlineSequence)
+            Anchor.startOfLine
             "excluded:"
             ZeroOrMore(.whitespace)
             Capture(
@@ -157,13 +109,17 @@ extension FileManager {
             ZeroOrMore(.whitespace)
             OneOrMore(.newlineSequence)
         }
+        .anchorsMatchLineEndings()
 
         if let match = contents?.firstMatch(of: excludeMatcher) {
 
             let trimmed = match.1.trimmingCharacters(in: .whitespacesAndNewlines)
-            let excludes = trimmed.split(separator: "- ").map { String($0) }
+            let excludes = trimmed.split(separator: "- ")
+                .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
 
-            let excludeRegex = try? Regex(excludes.joined(separator: "|"))
+            let escapedExcludes = excludes.map { NSRegularExpression.escapedPattern(for: $0) }
+            let excludeRegex = try? Regex(escapedExcludes.joined(separator: "|"))
             return excludeRegex
         }
 
