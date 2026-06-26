@@ -74,6 +74,9 @@ extension SwiftLintBuildTool {
         var lintFiles = inputPaths
         let configFile = FileManager.default.swiftlintConfigurationFile
 
+        // Note: --force-exclude doesn't work when the file is listed and it's parent directory is excluded.
+        // So we need to filter out excluded files our self.
+
         if let excludes = FileManager.default.excludePaths(from: configFile) {
             lintFiles = inputPaths.filter { !$0.contains(excludes) }
         }
@@ -83,16 +86,24 @@ extension SwiftLintBuildTool {
             exit(2)
         }
 
+        var arguments = [
+            "lint",
+            "--config", configFile,
+        ]
+
+        if ProcessInfo.processInfo.environment["CI_XCODE_CLOUD"] == "TRUE" {
+            arguments.append("--no-cache")
+        } else {
+            arguments.append("--cache-path")
+            arguments.append(outputDirectory.appendingPathComponent("cache").relativePath)
+        }
+
         return [
             .prebuildCommand(
                 displayName: "SwiftLint BuildTool Plugin",
                 executable: tool.url,
-                arguments: [
-                    "lint",
-                    "--config", configFile,
-                    "--cache-path", outputDirectory.appendingPathComponent("cache").relativePath
-                ] + lintFiles,
-                outputFilesDirectory: outputDirectory
+                arguments: arguments + lintFiles,
+                outputFilesDirectory: outputDirectory.appendingPathComponent("sources")
             )
         ]
     }

@@ -42,7 +42,7 @@ let package = Package(
         ),
         .plugin(
             name: "SwiftLintBuildTool",
-            capability: .buildTool(),
+            capability: .buildTool,
             dependencies: ["SwiftLintBinary"]
         ),
         .plugin(
