@@ -1,10 +1,12 @@
 # SwiftLintPlugin
 A Swift Package Manager plugin for SwiftLint, supporting both Swift Packages and Xcode Projects.
+
 This package provides plugin commands and a build tool command. The build tool runs SwiftLint before each build, and any issues are displayed in the Xcode Issue Navigator and code editor. For Swift Packages, the plugin commands can be executed from either the command line or within Xcode.
+
 These plugins respect the `exclude:` section in the top-level SwiftLint configuration file. As well as the Target membership, if a source file is not member of the Target it will not be linted.
 
 ## Requirements
-- **Xcode Version:**** **Xcode 16 or later is recomended, but you can use Xcode 14 or 15 by specifying branch `swift-5.7`
+- **Xcode Version:** Xcode 16 or later is recomended, but you can use Xcode 14 or 15 by specifying branch `swift-5.7`
 - **Swift Version:** Swift 6.0 or later is recomended, but you can use Swift 5.7 or later by specifying branch `swift-5.7`
 - **Required:** You must have a SwiftLint configuration file (`swiftlint.yml` or `.swiftlint.yml`) in the root folder of your package or project.
 
