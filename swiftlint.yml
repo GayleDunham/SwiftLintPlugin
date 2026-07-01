@@ -22,8 +22,19 @@
 #   The Official Kodeco Swift Style Guide -
 #       https://github.com/kodecocodes/swift-style-guide
 
+# ===========================================================================================
+#                                   IMPORTANT
+#
+#   - Copy this file or create a .swiftlint.yml config file in the root directory of your
+#     project or package.
+#
+#   - If you use this file, you should also copy the default organization settings file
+#     com.dirtydogsoftware.swiftlint.yml
+#
+# ===========================================================================================
+
 # Default DDS SwiftLint Configuration
-parent_config: /Users/Shared/com.dirtydogsoftware.swiftlint.yml
+parent_config: com.dirtydogsoftware.swiftlint.yml
 
 # Example to Ignore Core Data generated `NSManagedObject` subclasses during linting.
 #excluded:

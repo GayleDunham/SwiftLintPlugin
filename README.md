@@ -1,27 +1,18 @@
 # SwiftLintPlugin
-
 A Swift Package Manager plugin for SwiftLint, supporting both Swift Packages and Xcode Projects.
-
 This package provides plugin commands and a build tool command. The build tool runs SwiftLint before each build, and any issues are displayed in the Xcode Issue Navigator and code editor. For Swift Packages, the plugin commands can be executed from either the command line or within Xcode.
-
-These plugins respect the `exclude:` section in the top-level SwiftLint configuration file.
+These plugins respect the `exclude:` section in the top-level SwiftLint configuration file. As well as the Target membership, if a source file is not member of the Target it will not be linted.
 
 ## Requirements
-
-- **Recommended**: Xcode 16 or later, but you can use Xcode 14 or 15 by specifying branch `swift-5.7`
-
-- **Recommended**: Swift 6.0 or later, but you can use Swift 5.7 or later by specifying branch `swift-5.7`
-
-- **Required**: You must have a SwiftLint configuration file (`swiftlint.yml` or `.swiftlint.yml`) in the root folder of your package or project.
+- **Xcode Version:**** **Xcode 16 or later is recomended, but you can use Xcode 14 or 15 by specifying branch `swift-5.7`
+- **Swift Version:** Swift 6.0 or later is recomended, but you can use Swift 5.7 or later by specifying branch `swift-5.7`
+- **Required:** You must have a SwiftLint configuration file (`swiftlint.yml` or `.swiftlint.yml`) in the root folder of your package or project.
 
 ## Installation
-
 This package contains a `binaryTarget` for the current released version 0.63.2 of SwiftLint from [realm/SwiftLint](https://github.com/realm/SwiftLint/), used by all the plugin commands and the build tool command. No installation of SwiftLint or configuring of PATH is required.
-
 For more information on SwiftLint rules, see the [Rule Directory Reference](https://realm.github.io/SwiftLint/rule-directory.html).
 
 ## Adding Linting to a Swift Package
-
 1. Add `SwiftLintPlugin` as a dependency of your package.
 
 ```swift
@@ -41,15 +32,14 @@ For more information on SwiftLint rules, see the [Rule Directory Reference](http
         ),
 ```
 
+
 ## Adding Linting to an Xcode Project
 
 ### TL;DR
-
 1. Add the package `https://github.com/GayleDunham/SwiftLintPlugin` to the project.
 2. Optionally, add the `SwiftLintBuildTool` plugin to the targets you want to be evaluated by the linter.
 
 ### Add the Package to Your Project
-
 1. In the Project Navigator, select the first item (the project).
 2. In the Project Settings editor, select the project.
 3. Select the Package Dependencies tab.
@@ -126,36 +116,22 @@ xcodebuild  \
 ## References
 
 ### SwiftLint
-
 * SwiftLint Rule Directory Reference - [https://realm.github.io/SwiftLint/rule-directory.html](https://realm.github.io/SwiftLint/rule-directory.html)
 
 ### Example SwiftLint Configuration Files from Industry Leaders
-
-* The Official raywenderlich.com SwiftLint Policy - [https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown ](https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown)
-     
+* The Official raywenderlich.com SwiftLint Policy - [https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown ](https://github.com/kodecocodes/swift-style-guide/blob/main/SWIFTLINT.markdown)     
 * com.raywenderlich.swiftlint.yml - The Official Kodeco Configuration file - [https://github.com/kodecocodes/swift-style-guide/blob/main/com.raywenderlich.swiftlint.yml ](https://github.com/kodecocodes/swift-style-guide/blob/main/com.raywenderlich.swiftlint.yml)
-
 * The Official Kodeco Swift Style Guide - [https://github.com/kodecocodes/swift-style-guide ](https://github.com/kodecocodes/swift-style-guide)
-
 * SwiftLee Blog: SwiftLint valuable opt-in rules to improve your code - [https://www.avanderlee.com/optimization/swiftlint-optin-rules/ ](https://www.avanderlee.com/optimization/swiftlint-optin-rules/)
-
 * Swift API Design Guidelines - [https://www.swift.org/documentation/api-design-guidelines/ ](https://www.swift.org/documentation/api-design-guidelines/)
-
 * Google Swift Style Guide - [https://google.github.io/swift/ ](https://google.github.io/swift/)
-
 * LinkedIn Swift Style Guide - [https://github.com/linkedin/swift-style-guide ](https://github.com/linkedin/swift-style-guide)
-
 * Airbnb Swift Style Guide - [https://github.com/airbnb/swift ](https://github.com/airbnb/swift)
 
 ### Swift Package Plugins
-
 * WWDC 2022 Meet Swift Package plugins - [https://developer.apple.com/videos/play/wwdc2022/110359/ ](https://developer.apple.com/videos/play/wwdc2022/110359/)
-
 * WWDC 2022 Create Swift Package plugins - [https://developer.apple.com/videos/play/wwdc2022/110401/ ](https://developer.apple.com/videos/play/wwdc2022/110401/)
-
 * Xcode integration of Swift Package Plugins in Xcode 14 - [https://blog.eidinger.info/xcode-integration-of-swift-package-plugins-in-xcode-14 ](https://blog.eidinger.info/xcode-integration-of-swift-package-plugins-in-xcode-14)
-
 * Beginner's guide to Swift package manager command plugins - [https://theswiftdev.com/beginners-guide-to-swift-package-manager-command-plugins/ ](https://theswiftdev.com/beginners-guide-to-swift-package-manager-command-plugins/)
-
 * How to Use Xcode Plugins in Your iOS App - [https://betterprogramming.pub/how-to-use-xcode-plugins-in-your-ios-app-13574261f210 ](https://betterprogramming.pub/how-to-use-xcode-plugins-in-your-ios-app-13574261f210)
      

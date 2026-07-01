@@ -10,17 +10,20 @@
 #   https://dirtydogsoftware.atlassian.net/wiki/display/DT/Swift+Lint?src=contextnavpagetreemode
 #   https://www.avanderlee.com/optimization/swiftlint-optin-rules/
 
+#   - Copy this file or create a .swiftlint.yml config file in the root directory of your
+#     project or package.
+#
+#   - If you use this file, you should also copy the default organization settings file
+#     com.dirtydogsoftware.swiftlint.yml
+#
+
 # ===========================================================================================
 #                                   IMPORTANT
 #
-#   - Link this file to the Users Shared Directory
+#   - If you want to use it default organization settings file you should copy it in to
+#     in the root directory of your project or package.
 #
-#   gdunham % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/com.dirtydogsoftware.swiftlint.yml" /Users/Shared/com.dirtydogsoftware.swiftlint.yml
-#
-#   - Link the swiftlint.yml file to ~/bin/Resources/ for uses in scripts
-#
-#   gdunham % ln -s "/Users/gdunham/Library/CloudStorage/Dropbox/Development/Gayle Dunham GitHub/SwiftLintPlugin/swiftlint.yml" ~/bin/Resources/swiftlint.yml`
-#
+#   - Note: Using a shared team settings file outside the project will not work in Xcode Cloud
 #
 # ===========================================================================================
 
